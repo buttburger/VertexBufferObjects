@@ -1,0 +1,2 @@
+Included a triangulated(NOT QUADS) 3d cube with various vertices, indice faces, yet to be implemented texture arrays, and normals, all of which data is obtained from an .obj file from Blender for this example.
+Also notice how each normal's xyz coord is centered on each face xD
