@@ -189,7 +189,10 @@ int main(int argc, char**argv)
 	
 	
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //FILL OBJECT DRAW
+	
 	glewInit();
 	if(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader && GL_EXT_geometry_shader4)
 	{
