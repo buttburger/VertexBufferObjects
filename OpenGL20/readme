@@ -1,2 +1,0 @@
-Almost contracted cancer writing this one, but still a good start for loading colors along with vertices this time using stride. Note the layout location number is linking to our little VertexAttribArray since color data is being passed down to shaders.
-Accidently uploaded to vbo folder lol whoops, was meant to be in vao repository xD
