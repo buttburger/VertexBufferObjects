@@ -1,0 +1,23 @@
+﻿  Main.cpp
+Main.cpp(41): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(42): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(59): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(61): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(62): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(63): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(64): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(65): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(66): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(68): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(69): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(70): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(71): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(73): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(74): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(75): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(76): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(77): warning C4305: 'initializing' : truncation from 'double' to 'float'
+Main.cpp(78): warning C4305: 'initializing' : truncation from 'double' to 'float'
+  Generating code
+  Finished generating code
+  OpenGL14.vcxproj -> C:\Users\User\documents\visual studio 2012\Projects\OpenGL14\Release\OpenGL14.exe
