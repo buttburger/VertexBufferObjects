@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL17", "OpenGL17\OpenGL17.vcxproj", "{A467DC70-6E5D-41E0-81D5-CBB9A1350460}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A467DC70-6E5D-41E0-81D5-CBB9A1350460}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A467DC70-6E5D-41E0-81D5-CBB9A1350460}.Debug|Win32.Build.0 = Debug|Win32
+		{A467DC70-6E5D-41E0-81D5-CBB9A1350460}.Release|Win32.ActiveCfg = Release|Win32
+		{A467DC70-6E5D-41E0-81D5-CBB9A1350460}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
