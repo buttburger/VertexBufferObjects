@@ -299,7 +299,6 @@ void CallBackPassiveFunc(int x, int y)
 void CallBackMouseFunc(int button, int state, int x, int y)
 {
 	//Used when person clicks mouse
-	//camera.SetPos(button, state, x, y);
 	printf("BUTTON: %d STATE: %d X: %d Y: %d\n", button, state, x, y);
 }
 void CallBackMotionFunc(int x, int y)
