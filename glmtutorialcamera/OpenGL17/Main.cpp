@@ -298,27 +298,12 @@ void CallBackPassiveFunc(int x, int y)
 }
 void CallBackMouseFunc(int button, int state, int x, int y)
 {
-	//Used when person clicks mouse
 	printf("BUTTON: %d STATE: %d X: %d Y: %d\n", button, state, x, y);
 }
 void CallBackMotionFunc(int x, int y)
 {
-	/*
-	//compute the mouse delta from the previous mouse position
-	glm::vec3 mouse_delta = mouse_position - glm::vec3(x, y, 0);
-	//if the camera is moving, meaning that the mouse was clicked and dragged, change the pitch and heading
-	if(move_camera)
-	{
-		//ChangeHeading(.08f * mouse_delta.x);
-		//ChangePitch(.08f * mouse_delta.y);
-	}
-	mouse_position = glm::vec3(x, y, 0);
-	*/
-	xpos = x;
-	ypos = y;
-
+	xpos = x, ypos = y;
 	printf("DRAG! X: %d Y: %d\n", xpos, ypos);
-	//Used when person drags mouse around
 }
 int main(int argc, char**argv)
 {
