@@ -55,6 +55,7 @@ float lastx, lasty, xrot = 0, yrot = 0, zrot = 0;
 int modelx, modely, modelz; //MOVE LOADED OBJECT
 float targetx = 0, targety = 1, targetz = 0;
 float camx = 0, camy = 5, camz = 0;
+glm::vec3 eye = glm::vec3(camx, camy, camz);
 
 float ftest[] =
 {
@@ -73,7 +74,6 @@ float horizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 float speed = 3.0f; // 3 units / second
 float mouseSpeed = 0.005f;
-glm::vec3 eye = glm::vec3(camx, camy, camz);
 
 void display()
 {
