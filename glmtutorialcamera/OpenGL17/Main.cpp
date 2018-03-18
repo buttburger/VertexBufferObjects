@@ -49,19 +49,18 @@ unsigned int index, color, tx;
 int offset = 0;
 int swapshader = 0;
 
-float camx = 0, camy = -5, camz = 0;
-float targetx = 0, targety = 1, targetz = 0;
-int modelx, modely, modelz; //MOVE LOADED OBJECT
-
 int wkey=0, skey=0, akey=0, dkey=0; //WASD KEY
 float lastx, lasty, xrot = 0, yrot = 0, zrot = 0;
 
+int modelx, modely, modelz; //MOVE LOADED OBJECT
+float targetx = 0, targety = 1, targetz = 0;
+float camx = 0, camy = 5, camz = 0;
 
 float ftest[] =
 {
-	-2, 0, 0, 1, 0, 0,
+	2, 0, 0, 1, 0, 0,
 	0, 0, 2, 0, 1, 0,
-	2, 0, 0, 0, 0, 1,
+	-2, 0, 0, 0, 0, 1,
 };
 unsigned indarr[] =
 {
@@ -81,6 +80,38 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
+	/*
+	glm::vec3 position = glm::vec3( 0, 0, 5 ); 
+	// Initial horizontal angle : toward -Z
+	float horizontalAngle = 3.14f;
+	// Initial vertical angle : none
+	float verticalAngle = 0.0f;
+	// Initial Field of View
+	float initialFoV = 45.0f;
+
+	float speed = 3.0f; // 3 units / second
+	float mouseSpeed = 0.005f;
+	double xpos=0, ypos=0;
+
+	//glfwGetCursorPos(window, &xpos, &ypos);
+	// Reset mouse position for next frame
+	//glfwSetCursorPos(window, 1024/2, 768/2);
+	// Compute new orientation
+	horizontalAngle += float(SCREEN_WIDTH/2 - xpos );
+	verticalAngle   += float(SCREEN_HEIGHT/2 - ypos );
+	// Direction : Spherical coordinates to Cartesian coordinates conversion
+	glm::vec3 direction(
+		cos(verticalAngle) * sin(horizontalAngle), 
+		sin(verticalAngle),
+		cos(verticalAngle) * cos(horizontalAngle)
+	);
+	// Right vector
+	glm::vec3 right = glm::vec3(sin(horizontalAngle - 3.14f/2.0f), 
+		0, cos(horizontalAngle - 3.14f/2.0f));
+	// Up vector
+	glm::vec3 up = glm::cross( right, direction );
+	*/
+
 	GLuint uniformModel = glGetUniformLocation(prog_hdlr, "model");
 	GLuint uniformView = glGetUniformLocation(prog_hdlr, "view");
 	GLuint uniformProjection = glGetUniformLocation(prog_hdlr, "projection");
@@ -89,8 +120,8 @@ void display()
 	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
-	//glutWarpPointer(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-	SetCursorPos(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+	glutWarpPointer(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+	//SetCursorPos(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
 	horizontalAngle += mouseSpeed*float(SCREEN_WIDTH/2 - xpos);
 	verticalAngle   += mouseSpeed*float(SCREEN_HEIGHT/2 - ypos);
 	printf("hAngle: %f xPos: %d yPos: %d\n", horizontalAngle, xpos, ypos);
