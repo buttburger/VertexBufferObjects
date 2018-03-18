@@ -3,26 +3,28 @@
 #define _LIB
 #define FREEGLUT_LIB_PRAGMAS 0
 #pragma comment(lib, "libpng16.lib")
-#pragma comment (lib, "libglew32.lib")
-#pragma comment(lib, "libglew32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "freeglut_static.lib")
+#pragma comment(lib, "glfw3.lib")
 #include <stdio.h>
 #include <stdlib.h>
 #include <glew.h>
 #include <freeglut.h>
+#include <glfw3.h>
+
 #include <glm\glm.hpp>
 #include <glm\vec3.hpp>
 #include <glm\vec4.hpp>
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\gtc\matrix_transform.hpp>
+
+#include <png.h>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <math.h>
-#include <png.h>
-
-
-#include <glfw3.h>
 
 #include "Camera.h"
 #include "object.h"
@@ -34,18 +36,6 @@ using namespace std;
 int refreshMS = 1000/60; //60fps
 GLuint prog_hdlr;
 const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
-
-float ftest[] =
-{
-	2, 0, 0, 1, 0, 0,
-	0, 0, 2, 0, 1, 0,
-	-2, 0, 0, 0, 0, 1,
-};
-
-unsigned indarr[] =
-{
-	0,1,2,
-};
 
 GLuint Texture;
 GLuint vertexbuffer;
@@ -59,15 +49,24 @@ unsigned int index, color, tx;
 int offset = 0;
 int swapshader = 0;
 
-float camx = 0, camy = 5, camz = 0;
+float camx = 0, camy = -5, camz = 0;
 float targetx = 0, targety = 1, targetz = 0;
 int modelx, modely, modelz; //MOVE LOADED OBJECT
 
 int wkey=0, skey=0, akey=0, dkey=0; //WASD KEY
 float lastx, lasty, xrot = 0, yrot = 0, zrot = 0;
 
-bool move_camera;
-//glm::vec3 mouse_position;
+
+float ftest[] =
+{
+	-2, 0, 0, 1, 0, 0,
+	0, 0, 2, 0, 1, 0,
+	2, 0, 0, 0, 0, 1,
+};
+unsigned indarr[] =
+{
+	0,1,2,
+};
 
 int xpos = 0, ypos = 0;
 float horizontalAngle = 3.14f;
@@ -76,6 +75,7 @@ float verticalAngle = 0.0f;
 float speed = 3.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 glm::vec3 eye = glm::vec3(camx, camy, camz);
+
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -121,21 +121,17 @@ void display()
 	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
-	glutWarpPointer(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-	//SetCursorPos(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-	//printf("TEST: %d - %d\n", xpos, ypos);
-	horizontalAngle += mouseSpeed * float(SCREEN_WIDTH/2 - xpos);
-	verticalAngle   += mouseSpeed * float(SCREEN_HEIGHT/2 - ypos);
-
+	//glutWarpPointer(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+	SetCursorPos(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+	horizontalAngle += mouseSpeed*float(SCREEN_WIDTH/2 - xpos);
+	verticalAngle   += mouseSpeed*float(SCREEN_HEIGHT/2 - ypos);
 	printf("hAngle: %f xPos: %d yPos: %d\n", horizontalAngle, xpos, ypos);
 	
 	glm::vec3 target = //glm::vec3(targetx, targety, targetz);
-	///*
 	glm::vec3(
 	cos(verticalAngle) * sin(horizontalAngle), 
 	sin(verticalAngle),
 	cos(verticalAngle) * cos(horizontalAngle));
-	//*/
 
 	// Right vector
 	glm::vec3 right = glm::vec3(
@@ -143,27 +139,17 @@ void display()
 		0,
 		cos(horizontalAngle - 3.14f/2.0f));
 
-	//float fasdf = sin(horizontalAngle - 3.14f/2.0f);
-	//printf("FASDF: %f\n", fasdf);
-
-	//glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f); //up = glm::cross(right, target);
 	glm::vec3 up = glm::cross(right, target);
 
-	// Move forward
-	if(wkey == 1)eye += target* 0.75f *speed;
-	// Move backward
-	if(skey == 1)eye -= target* 0.75f *speed;
-	// Strafe right
-	if(dkey == 1)eye += right* 0.75f * speed;
-	// Strafe left
-	if(akey == 1)eye -= right* 0.75f * speed;
+	if(wkey == 1)eye += target*0.75f*speed; //Move forward
+	if(skey == 1)eye -= target*0.75f*speed; //Move backward
+	if(dkey == 1)eye += right* 0.75f*speed; //Strafe right
+	if(akey == 1)eye -= right* 0.75f*speed; //Strafe left
 
+	//float hAngleTEST = sin(horizontalAngle - 3.14f/2.0f);
+	//printf("hAngleTEST: %f\n", hAngleTEST);
+	//glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f); //up = glm::cross(right, target);
 
-
-
-
-
-	//glm::mat4 view = glm::lookAt(eye, target, up);
 	glm::mat4 view = LookAt(eye, eye+target, up);
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -263,31 +249,9 @@ void timer(int value)
 	glutPostRedisplay();
 	glutTimerFunc(refreshMS, timer, 0);
 }
-
-void mouseMovement(int x, int y)
-{
-	xpos = x;
-	ypos = y;
-
-	/*
-	int diffx = x-(int)lastx;
-	int diffy = y-(int)lasty;
-	lastx = (float)x;
-	lasty = (float)y;
-	xrot -= (float)diffy; //UP AND DOWN
-	//yrot += (float)diffx; //TILT LEFT AND RIGHT
-	zrot -= (float)diffx; //LEFT AND RIGHT
-
-	//ztest =	cos(xrot/180*3.141592654f);
-	//xtest = sin(zrot/180*3.141592654f);
-	//printf("xrot: %f zrot: %f\n", xtest, ztest);
-	*/
-}
-
 void initGL()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	
 	/*
 	GLfloat LightModelAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, LightModelAmbient);
@@ -311,7 +275,6 @@ void initGL()
 	
 	xpos = SCREEN_WIDTH/2;
 	ypos = SCREEN_HEIGHT/2;
-
 
 	//glEnable(GL_CULL_FACE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -363,15 +326,15 @@ void initGL()
 	}
 }
 void CallBackPassiveFunc(int x, int y)
-{}
+{
+	//BLANK
+}
 void CallBackMouseFunc(int button, int state, int x, int y)
 {
 	//Used when person clicks mouse
 	//camera.SetPos(button, state, x, y);
 	printf("BUTTON: %d STATE: %d X: %d Y: %d\n", button, state, x, y);
 }
-
-
 void CallBackMotionFunc(int x, int y)
 {
 	/*
@@ -400,7 +363,6 @@ int main(int argc, char**argv)
 	glutCreateWindow("GLSL tutorial");
 	initGL();
 	glutDisplayFunc(display);
-	glutPassiveMotionFunc(mouseMovement);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 	glutKeyboardFunc(keyDown);
 	glutKeyboardUpFunc(keyUp);
@@ -412,6 +374,8 @@ int main(int argc, char**argv)
 	glutMainLoop();
 	return 0;
 }
+//glutSetCursor(GLUT_CURSOR_NONE);
+//glfwDisable(GLFW_MOUSE_CURSOR);
 /*
 //glutReshapeFunc(reshape);
 void reshape(GLsizei w, GLsizei h)
