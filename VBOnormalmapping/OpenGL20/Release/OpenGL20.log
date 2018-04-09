@@ -1,0 +1,9 @@
+﻿  Main.cpp
+Main.cpp(346): warning C4101: 'height' : unreferenced local variable
+Main.cpp(346): warning C4101: 'width' : unreferenced local variable
+Main.cpp(347): warning C4101: 'hasAlpha' : unreferenced local variable
+  Generating code
+  Finished generating code
+texture.obj : warning LNK4049: locally defined symbol ___glewCompressedTexImage2D imported
+texture.obj : warning LNK4049: locally defined symbol ___glewGenerateMipmap imported
+  OpenGL20.vcxproj -> C:\Users\User\Documents\Visual Studio 2012\Projects\OpenGL20\Release\OpenGL20.exe
