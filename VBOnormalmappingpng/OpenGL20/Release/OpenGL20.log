@@ -1,0 +1,5 @@
+﻿  Main.cpp
+  Generating code
+  Finished generating code
+texture.obj : warning LNK4049: locally defined symbol ___glewCompressedTexImage2D imported
+  OpenGL20.vcxproj -> C:\Users\User\documents\visual studio 2012\Projects\OpenGL20\Release\OpenGL20.exe
