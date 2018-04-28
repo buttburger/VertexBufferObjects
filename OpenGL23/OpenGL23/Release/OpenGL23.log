@@ -1,0 +1,5 @@
+﻿  load_textures.cpp
+  Generating code
+  Finished generating code
+Texture.obj : warning LNK4049: locally defined symbol ___glewCompressedTexImage2D imported
+  OpenGL23.vcxproj -> C:\Users\User\Documents\Visual Studio 2012\Projects\OpenGL23\Release\OpenGL23.exe
