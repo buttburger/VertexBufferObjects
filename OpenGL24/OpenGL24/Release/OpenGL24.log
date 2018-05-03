@@ -1,0 +1,8 @@
+﻿  Main.cpp
+Main.cpp(53): warning C4244: '=' : conversion from 'double' to 'clock_t', possible loss of data
+Main.cpp(123): warning C4101: 'height' : unreferenced local variable
+Main.cpp(123): warning C4101: 'width' : unreferenced local variable
+Main.cpp(124): warning C4101: 'hasAlpha' : unreferenced local variable
+  Generating code
+  Finished generating code
+  OpenGL24.vcxproj -> C:\Users\User\documents\visual studio 2012\Projects\OpenGL24\Release\OpenGL24.exe
