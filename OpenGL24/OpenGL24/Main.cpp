@@ -13,8 +13,6 @@
 #include <glew.h>
 #include <freeglut.h>
 #include <glfw3.h>
-// Include GLFW
-#include <glfw3.h>
 // Include GLM
 #include <glm\glm.hpp>
 #include <glm\vec3.hpp>
@@ -33,24 +31,27 @@
 #include "Camera.h"
 #include "load_shaders.h"
 #include "load_textures.h"
-#include "controls.h"
 #include "objloader.h"
 #include "vboindexer.h"
 using namespace glm;
 
 GLFWwindow*window;
-GLuint prog_hdlr;
 int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
+GLuint programID;
 
-double alastTime;
-double acurrentTime;
-float adeltaTime;
-int frameCount = 0;
+// Initial position : on +Z
+float eyeX = 0, eyeY = 1, eyeZ = 5;
+glm::vec3 eye = glm::vec3(eyeX, eyeY, eyeZ);
+float modelX = 0, modelY = 0, modelZ = 0;
+float horizontalAngle = 3.14f; // Initial horizontal angle : toward -Z
+float verticalAngle = 0.0f; // Initial vertical angle : none
+float speed = 3.0f; // 3 units / second
+float mouseSpeed = 0.005f;
 
 void wait(double seconds)
 {
-	clock_t endwait;
-	endwait = clock () + seconds * CLOCKS_PER_SEC;
+	double endwait; //clock_t
+	endwait = clock() + seconds * CLOCKS_PER_SEC;
 	while(clock() < endwait){}
 }
 int main()
@@ -97,41 +98,25 @@ int main()
 
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
-	// Enable depth test
-	glEnable(GL_DEPTH_TEST);
-	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS); 
-
-	// Cull triangles which normal is not towards the camera
-	glEnable(GL_CULL_FACE);
-
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
+	glEnable(GL_DEPTH_TEST); // Enable depth test
+	glDepthFunc(GL_LESS); // Accept fragment if it closer to the camera than the former one
+	glEnable(GL_CULL_FACE); // Cull triangles which normal is not towards the camera
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID;
 	loadShaders(programID, "shaders/vert_shader.glsl", "shaders/frag_shader.glsl");
-		//"StandardShading.vertexshader", "StandardShading.fragmentshader" );
-
-	// Get a handle for our "MVP" uniform
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-	GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
-	GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
 
 	int width, height;
 	bool hasAlpha;
 	char filename[] = "texture.png", filename1[] = "ntexture.png", filename2[] = "stexture.png";
-	
 	// Load the texture
 	GLuint Texture = //loadBMP_custom("test.bmp");
-		//loadPngImage(filename, width, height, hasAlpha, &textureImage);
+		loadPngImage(filename, width, height, hasAlpha, &textureImage);
 		//LoadBMP("test.bmp");
-		loadDDS("uvmap.DDS");
-
+		//loadDDS("uvmap.DDS");
+	
 	// Get a handle for our "myTextureSampler" uniform
-	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+	GLuint TextureID  = glGetUniformLocation(programID, "myTexture");
+	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
@@ -144,6 +129,10 @@ int main()
 	std::vector<glm::vec2> indexed_uvs;
 	std::vector<glm::vec3> indexed_normals;
 	indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
+
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
 	//VBO BUFFERS
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
@@ -162,77 +151,73 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0] , GL_STATIC_DRAW);
 
-	// Get a handle for our "LightPosition" uniform
 	glUseProgram(programID);
+	// Get a handle for our "LightPosition" uniform
 	//GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
 
-	// For speed computation
-	double lastTime = glfwGetTime();
+	int frames = 0;
 	int nbFrames = 0;
-
-	static double limitFPS = 1.0 / 45.0;
-	//double lastTime = glfwGetTime();
+	double currentTime;
+	float deltaTime;
+	double limitFPS = 1.0/45.0;
+	double lastTime = glfwGetTime();
 	double timer = lastTime;
-	double deltaTime = 0, nowTime = 0;
-	int frames = 0 , updates = 0;
-
-	double test;
 
 	for(;;)
 	{
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		//glUseProgram(programID); //Use our shader
 
-		// Measure speed
-		double currentTime = glfwGetTime();
-		nbFrames++;
-		if ( currentTime - lastTime >= 1.0 )
-		{ // If last prinf() was more than 1sec ago
-			// printf and reset
-			printf("%f ms/frame\n", 1000.0/double(nbFrames));
-			nbFrames = 0;
-			lastTime += 1.0;
-		}
+		currentTime = glfwGetTime();
+		deltaTime = float(currentTime - lastTime);
 
+		// Get mouse position
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		// Reset mouse position for next frame
+		glfwSetCursorPos(window, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+
+		// Compute new orientation
+		horizontalAngle += mouseSpeed * float(SCREEN_WIDTH /2 - xpos);
+		verticalAngle   += mouseSpeed * float(SCREEN_HEIGHT/2 - ypos);
+		//printf("hA: %f vA: %f xPos: %f yPos: %f\n", horizontalAngle, verticalAngle, xpos, ypos);
+
+		// Direction : Spherical coordinates to Cartesian coordinates conversion
+		glm::vec3 target(cos(verticalAngle) * sin(horizontalAngle), 
+						sin(verticalAngle),
+						cos(verticalAngle) * cos(horizontalAngle));
+		// Right vector
+		glm::vec3 right = glm::vec3(sin(horizontalAngle - 3.14f/2.0f), 
+									0,
+									cos(horizontalAngle - 3.14f/2.0f));
+		glm::vec3 up = glm::cross(right, target); // Up vector
+
+		if(glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
+			eye += target * deltaTime * speed;} // Move forward
+		if(glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
+			eye -= target * deltaTime * speed;} // Move backward
+		if(glfwGetKey( window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
+			eye += right * deltaTime * speed;} // Strafe right
+		if(glfwGetKey( window, GLFW_KEY_LEFT ) == GLFW_PRESS){
+			eye -= right * deltaTime * speed;} // Strafe left
+
+		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT, 0.1f, 1000.0f);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(projection));
+		glm::mat4 view = LookAt(eye, eye+target, up);
+		glm::mat4 ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(modelX, modelY, modelZ));
+		glm::mat4 MVP = projection * view * ModelMatrix;
+		//Send our transformation to the currently bound shader in the "MVP" uniform
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 		/*
-		nowTime = glfwGetTime();
-        deltaTime += (nowTime - lastTime) / limitFPS;
-        lastTime = nowTime;
-        while(deltaTime >= 1.0)
-		{
-            //update(); //Update function
-            updates++;
-            deltaTime--;
-        }
+		glm::vec3 lightPos = glm::vec3(4,4,-4);
+		glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 		*/
-
-		acurrentTime = glfwGetTime();
-		adeltaTime = float(acurrentTime - alastTime);
-		//printf("DELTA: %f\n", adeltaTime);
-		//printf("currTime: %f\n", acurrentTime);
-
-		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
-		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		glm::mat4 ViewMatrix = getViewMatrix();
-		glm::mat4 ModelMatrix = glm::mat4(1.0);
-		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
-
-		// Send our transformation to the currently bound shader in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-		glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
-
-		//glm::vec3 lightPos = glm::vec3(4,4,-4);
-		//glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
-
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -247,34 +232,26 @@ int main()
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		// Index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-		// Draw the triangles !
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
-		glfwSwapBuffers(window); //Swap buffers
+		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		alastTime = acurrentTime;
-		//printf("alastTime: %f\n", alastTime);
 		frames++;
-
-		acurrentTime = glfwGetTime();
-		test = (acurrentTime - alastTime);
-		//printf("TEST: %f\n", test);
-		wait(limitFPS - test);
-
-		//Reset after one second
-		if(glfwGetTime() - timer > 1.0)
+		lastTime = currentTime;
+		currentTime = glfwGetTime();
+		deltaTime = (float)(currentTime - lastTime);
+		wait(limitFPS - deltaTime);
+		if(currentTime - timer > 1.0) //Reset after one second
 		{
 			timer++;
-			//std::cout << "FPS: " << frames << " Updates:" << updates << std::endl;
-			updates = 0, frames = 0;
+			printf("FPS: %d - %fms\n", frames, 1000.0/double(frames));
+			frames = 0;
 		}
 		if((glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS && glfwWindowShouldClose(window) == 0))break;
 	}
-
-	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &uvbuffer);
 	glDeleteBuffers(1, &normalbuffer);
