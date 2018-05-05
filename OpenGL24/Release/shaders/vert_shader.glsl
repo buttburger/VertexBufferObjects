@@ -6,9 +6,9 @@ layout(location = 2) in vec3 vertexNormal;
 
 out vec2 UV;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+//uniform mat4 model;
+//uniform mat4 view;
+//uniform mat4 projection;
 
 uniform mat4 MVP;
 
