@@ -71,6 +71,12 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+	//Get version info
+	const GLubyte*renderer = glGetString(GL_RENDERER);//get renderer string
+	const GLubyte*version = glGetString(GL_VERSION);//version as a string
+	printf("Renderer: %s\n", renderer);
+	printf("OpenGL version supported %s\n", version);
+
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);//Dark blue background
 	glEnable(GL_DEPTH_TEST);//Enable depth test
 	glDepthFunc(GL_LESS);//Accept fragment if it closer to the camera than the former one
@@ -78,7 +84,7 @@ int main()
 	
 	int frames = 0;
 	double currentTime;
-	double limitFPS = 1.0/65.0;
+	double limitFPS = 1.0/45.0;
 	double lastTime = glfwGetTime();
 	double timer = lastTime;
 	bool mousefix = 0;
@@ -155,7 +161,8 @@ int main()
 		}
 		if(dostuff == 3)
 		{
-			//
+			printf("I HAVE THE SHINIEST MEAT BICYCLE!\n");
+			dostuff = 0;
 		}
 		loadVBO(0);
 		loadVBO(1);
